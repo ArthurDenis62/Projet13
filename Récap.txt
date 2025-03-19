@@ -1,0 +1,20 @@
+Résumé de ton projet
+Développement front-end d’une application bancaire en React et Redux, en intégrant une API REST côté back-end.
+
+Ce que je dois faire
+Développer l’interface utilisateur en React :
+-Créer un tableau de bord responsive pour visualiser les transactions, soldes, etc.
+-Travailler l’UX/UI pour une navigation fluide.
+
+Gérer l’état global avec Redux :
+-Stocker les données des transactions, du solde, des utilisateurs.
+-Assurer que les mises à jour des données soient réactives dans toute l’app.
+
+Connecter le front-end au back-end via API REST :
+-Envoyer des requêtes HTTP (GET, POST, PUT, DELETE) pour interagir avec les données.
+-Gérer les erreurs et les chargements.
+
+Utiliser Swagger pour documenter l’API :
+-Définir les endpoints et leurs réponses.
+-Faciliter la communication entre dev front et back.
+-Node.js (côté serveur) :
