@@ -9,7 +9,7 @@ const User = () => {
   const dispatch = useDispatch();
   const [firstName, setFirstName] = useState(user?.firstName || '');
   const [lastName, setLastName] = useState(user?.lastName || '');
-  const [transactions, setTransactions] = useState([]);
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -31,7 +31,6 @@ const User = () => {
         const userDetails = response.data.body;
         setFirstName(userDetails.firstName);
         setLastName(userDetails.lastName);
-        setTransactions(userDetails.transactions || []);
         dispatch(loginSuccess({ user: userDetails, token: storedToken }));
       } catch (error) {
         console.error('Erreur lors de la récupération des données utilisateur:', error);
@@ -54,39 +53,71 @@ const User = () => {
       );
       const updatedUser = response.data.body;
       dispatch(updateUser(updatedUser));
+      setIsEditing(false);
     } catch (error) {
       console.error('Erreur lors de la mise à jour des informations utilisateur:', error);
     }
   };
 
+  const handleCancel = () => {
+    setFirstName(user?.firstName || '');
+    setLastName(user?.lastName || '');
+    setIsEditing(false);
+  };
+
   return (
-    <main className="main bg-dark">
+    <main>
       <div className="header">
-        <h1>Welcome back <br /> {firstName} {lastName}!</h1>
-        <div>
-            <div>
-                <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
-                <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} />
-            </div>
-            <div>
-                <button onClick={handleUpdate}>Mettre à jour</button>
-            </div>
-        </div>
-      <h2>Vos transactions :</h2>
-      <ul>
-        {transactions.length > 0 ? (
-          transactions.map((transaction, index) => (
-            <li key={index}>
-              <strong>Date :</strong> {transaction.date} <br />
-              <strong>Montant :</strong> {transaction.amount}€ <br />
-              <strong>Description :</strong> {transaction.description}
-            </li>
-          ))
+        <h1>Welcome back</h1>
+        {!isEditing ? (
+          <>
+            <h1>{firstName} {lastName}!</h1>
+            <button className="edit-button" onClick={() => setIsEditing(true)}>Edit Name</button>
+          </>
         ) : (
-          <p>Aucune transaction disponible.</p>
+          <div>
+            <div className='input-content'>
+              <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
+              <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} />
+            </div>
+            <div className='input-content'>
+              <button className="edited-button" onClick={handleUpdate}>Enregistrer</button>
+              <button className="edited-button" onClick={handleCancel}>Cancel</button>
+            </div>
+          </div>
         )}
-      </ul>
-    </div>
+      </div>
+      <h2 className="sr-only">Accounts</h2>
+          <section className="account">
+            <div className="account-content-wrapper">
+              <h3 className="account-title">Argent Bank Checking (x8349)</h3>
+              <p className="account-amount">$2,082.79</p>
+              <p className="account-amount-description">Available Balance</p>
+            </div>
+            <div className="account-content-wrapper cta">
+              <button className="transaction-button">View transactions</button>
+            </div>
+          </section>
+          <section className="account">
+            <div className="account-content-wrapper">
+              <h3 className="account-title">Argent Bank Savings (x6712)</h3>
+              <p className="account-amount">$10,928.42</p>
+              <p className="account-amount-description">Available Balance</p>
+            </div>
+            <div className="account-content-wrapper cta">
+              <button className="transaction-button">View transactions</button>
+            </div>
+          </section>
+          <section className="account">
+            <div className="account-content-wrapper">
+              <h3 className="account-title">Argent Bank Credit Card (x8349)</h3>
+              <p className="account-amount">$184.30</p>
+              <p className="account-amount-description">Current Balance</p>
+            </div>
+            <div className="account-content-wrapper cta">
+              <button className="transaction-button">View transactions</button>
+            </div>
+          </section>
     </main>
   );
 };

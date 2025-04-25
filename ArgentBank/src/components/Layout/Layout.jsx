@@ -19,13 +19,20 @@ const Layout = () => {
                 <img className="main-nav-logo-image" src="../design/img/argentBankLogo.png" alt="Argent Bank Logo" />
                 <h1 className="sr-only">Argent Bank</h1>
             </Link>
-            <div>
+            <div className="main-nav-wrapper">
                 {user ? (<>
-                        <span>{user.firstName} {user.lastName}</span>
-                        <button className="main-nav-item" onClick={handleLogout}>
+                    <div className="main-nav-content">
+                        <img className="main-profile-logo-image" src="../design/img/profile.png" alt="Profile" />
+                        <Link to={`/user/${user.id}`} className="main-nav-item">
+                            {user.firstName}
+                        </Link>
+                    </div>
+                    <div className="main-nav-content-bis">
+                        <a className="main-nav-item" onClick={handleLogout}>
                             <i className="fa fa-sign-out"></i>
                             Sign Out
-                        </button>
+                        </a>
+                    </div>
                     </>) : (
                     <Link className="main-nav-item" to="/signin">
                         <i className="fa fa-user-circle"></i>

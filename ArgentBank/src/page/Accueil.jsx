@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { loginSuccess } from "../redux/features/authSlice";
+import { fetchUserDetails } from "../api/auth";
 
 const Accueil = () => {
     const dispatch = useDispatch();
@@ -8,13 +9,18 @@ const Accueil = () => {
     useEffect(() => {
         const token = localStorage.getItem("token");
         if (token) {
-        dispatch(loginSuccess({ user: null, token }));
+            fetchUserDetails(token).then((userDetails) => {
+                dispatch(loginSuccess({ user: userDetails, token }));
+            }).catch((error) => {
+                console.error('Erreur lors de la récupération des informations utilisateur:', error);
+            });
         }
     }, [dispatch]);
+
     return(<>
         <main>
             <div className="hero">
-                <section className="hero-content" style={{backgroundColor: "black"}}>
+                <section className="hero-content">
                     <h2 className="sr-only">Promoted Content</h2>
                     <p className="subtitle">No fees.</p>
                     <p className="subtitle">No minimum deposit.</p>

@@ -13,12 +13,18 @@ body {
   min-height: 100vh;
 }
 
+button, a {
+  cursor: pointer;
+}
+
 .main {
   flex: 1;
+  padding-top: 2em;
 }
 
 .bg-dark {
   background-color: #12002b;
+  height: 100vh;
 }
 
 .sr-only {
@@ -56,10 +62,6 @@ body {
   margin-right: 0.5rem;
 }
 
-.main-nav-item:hover {
-  text-decoration: underline;
-}
-
 .main-nav-logo {
   display: flex;
   align-items: center;
@@ -70,8 +72,34 @@ body {
   width: 200px;
 }
 
+.main-nav-wrapper {
+  display: flex;
+  align-items: center;
+  column-gap: 1em;
+}
+
+.main-nav-content {
+  display: flex;
+  align-items: center;
+}
+
+.main-nav-content-bis a {
+  display: flex;
+  align-items: center;
+  column-gap: 6px;
+}
+
+.main-nav-content-bis i {
+  font-size: 24px;
+}
+
+.main-profile-logo-image {
+  max-width: 100%;
+  width: 50px;
+}
+
 .hero {
-  background-image: url('../img/bank-tree.jpeg');
+  background-image: url('../design/img/bank-tree.jpeg');
   background-position: 0 -50px;
   background-size: cover;
   background-repeat: no-repeat;
@@ -259,6 +287,15 @@ body {
   padding: 10px;
 }
 
+.edited-button {
+  background-color: #ffffff;
+  color: #00bc77;
+  font-weight: bold;
+  padding: 10px;
+  border: 2px solid #00bc77;
+  margin-top: 1em;
+}
+
 .header {
   color: #fff;
   margin-bottom: 2rem;
@@ -288,4 +325,25 @@ body {
   .transaction-button {
     width: 200px;
   }
+}
+
+.header h1 {
+  color: black;
+}
+
+.input-content {
+  display: flex;
+  justify-content: center;
+  column-gap: 1em;
+}
+
+.input-content input {
+  padding: 8px;
+  color: grey;
+  border: 1.8px solid grey;
+  border-radius: 4px;
+}
+
+.input-content button {
+  width: 100px;
 }
