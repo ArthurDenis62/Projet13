@@ -120,57 +120,45 @@ paths:
         - Bearer: []
       tags:
         - Transactions
-      summary: Get all transactions for the current user
-      description: Retrieve all transactions for the current month, optionally filtered by account ID.
+      summary: Liste des transactions du mois en cours, groupées par compte
+      description: |
+        Retourne toutes les transactions de l'utilisateur pour le mois spécifié, groupées par compte.
+        Possibilité de filtrer par compte avec le paramètre accountId.
       parameters:
         - name: month
           in: query
-          description: Month in YYYY-MM format
+          description: Mois au format YYYY-MM (ex: 2024-06)
           required: true
           type: string
         - name: accountId
           in: query
-          description: Optional account ID to filter transactions by account
+          description: ID du compte à filtrer (optionnel)
           required: false
           type: string
       produces:
         - application/json
       responses:
         '200':
-          description: Transactions retrieved successfully
+          description: Liste des transactions récupérée avec succès, groupées par compte
           schema:
-            type: array
-            items:
-              $ref: '#/definitions/Transaction'
+            type: object
+            properties:
+              accounts:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    accountId:
+                      type: string
+                      description: ID du compte
+                    transactions:
+                      type: array
+                      items:
+                        $ref: '#/definitions/Transaction'
         '401':
-          description: Unauthorized
+          description: Non autorisé
         '500':
-          description: Internal Server Error
-
-    post:
-      security:
-        - Bearer: []
-      tags:
-        - Transactions
-      summary: Add a new transaction
-      description: Add a transaction to a user account
-      parameters:
-        - in: body
-          name: body
-          required: true
-          schema:
-            $ref: '#/definitions/Transaction'
-      produces:
-        - application/json
-      responses:
-        '201':
-          description: Transaction created successfully
-        '400':
-          description: Invalid input
-        '401':
-          description: Unauthorized
-        '500':
-          description: Internal Server Error
+          description: Erreur serveur
 
   /transactions/{transactionId}:
     get:
@@ -178,73 +166,60 @@ paths:
         - Bearer: []
       tags:
         - Transactions
-      summary: Get transaction details
-      description: Retrieve detailed information about a specific transaction
+      summary: Détail d'une transaction
+      description: Retourne le détail d'une transaction spécifique.
       parameters:
         - name: transactionId
           in: path
+          description: ID de la transaction
           required: true
           type: string
       produces:
         - application/json
       responses:
         '200':
-          description: Transaction details retrieved
+          description: Détail de la transaction récupéré
           schema:
             $ref: '#/definitions/Transaction'
         '404':
-          description: Transaction not found
+          description: Transaction non trouvée
         '401':
-          description: Unauthorized
+          description: Non autorisé
 
     put:
       security:
         - Bearer: []
       tags:
         - Transactions
-      summary: Update a transaction
-      description: Modify the details of an existing transaction
+      summary: Modifier une transaction
+      description: |
+        Permet de modifier certaines informations d'une transaction (description, catégorie, notes).
+        Les champs montant, date, type ne sont pas modifiables.
       parameters:
         - name: transactionId
           in: path
+          description: ID de la transaction à modifier
           required: true
           type: string
         - in: body
           name: body
+          description: Champs modifiables de la transaction
           required: true
           schema:
-            $ref: '#/definitions/Transaction'
+            $ref: '#/definitions/TransactionUpdate'
       produces:
         - application/json
       responses:
         '200':
-          description: Transaction updated successfully
+          description: Transaction modifiée avec succès
+          schema:
+            $ref: '#/definitions/Transaction'
         '400':
-          description: Invalid input
+          description: Données invalides
         '404':
-          description: Transaction not found
+          description: Transaction non trouvée
         '401':
-          description: Unauthorized
-
-    delete:
-      security:
-        - Bearer: []
-      tags:
-        - Transactions
-      summary: Delete a transaction
-      description: Remove a transaction from the system
-      parameters:
-        - name: transactionId
-          in: path
-          required: true
-          type: string
-      responses:
-        '204':
-          description: Transaction deleted successfully
-        '404':
-          description: Transaction not found
-        '401':
-          description: Unauthorized
+          description: Non autorisé
 
 securityDefinitions:
   Bearer:
@@ -253,85 +228,48 @@ securityDefinitions:
     in: header
 
 definitions:
-  User:
-    properties:
-      email:
-        type: string
-        description: user email
-      password:
-        type: string
-        description: user password
-      firstName:
-        type: string
-        description: user first name
-      lastName:
-        type: string
-        description: user last name
-
-  Login:
-    properties:
-      email:
-        type: string
-        description: user email
-      password:
-        type: string
-        description: user password
-
-  ApiResponse:
-    type: object
-    properties:
-      status:
-        type: integer
-      message:
-        type: string
-      body:
-        type: object
-        properties:
-          id:
-            type: string
-          email:
-            type: string
-
-  LoginResponse:
-    type: object
-    properties:
-      token:
-        type: string
-
-  UserProfile:
-    type: object
-    properties:
-      firstName:
-        type: string
-      lastName:
-        type: string
-
   Transaction:
     type: object
     properties:
       id:
         type: string
-        description: Unique transaction ID
+        description: ID unique de la transaction
       accountId:
         type: string
-        description: ID of the associated account
+        description: ID du compte associé
       date:
         type: string
         format: date
-        description: Date of the transaction (YYYY-MM-DD)
+        description: Date de la transaction (YYYY-MM-DD)
       amount:
         type: number
         format: float
-        description: Transaction amount (positive or negative)
+        description: Montant de la transaction (positif ou négatif)
       type:
         type: string
-        description: Transaction type (e.g., withdrawal, deposit)
+        description: Type de transaction (ex: withdrawal, deposit)
       description:
         type: string
-        description: Transaction description
+        description: Description de la transaction
       category:
         type: string
-        description: Expense category
+        description: Catégorie de dépense
       notes:
         type: string
-        description: Optional user notes
+        description: Notes utilisateur (optionnel)
+
+  TransactionUpdate:
+    type: object
+    properties:
+      description:
+        type: string
+        description: Nouvelle description
+      category:
+        type: string
+        description: Nouvelle catégorie
+      notes:
+        type: string
+        description: Notes utilisateur
+    required:
+      - description
+      - category

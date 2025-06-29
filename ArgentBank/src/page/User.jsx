@@ -1,61 +1,32 @@
 import { useSelector, useDispatch } from 'react-redux';
 import { useState, useEffect } from 'react';
-import { updateUser, loginSuccess } from '../redux/features/authSlice';
+import { fetchUser, updateUser } from '../redux/features/authSlice';
 import axios from 'axios';
 
 const User = () => {
-  const user = useSelector((state) => state.auth.user);
-  const token = useSelector((state) => state.auth.token);
+  const { user, token, loading, error } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const [firstName, setFirstName] = useState(user?.firstName || '');
   const [lastName, setLastName] = useState(user?.lastName || '');
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const storedToken = token || localStorage.getItem('token');
-        if (!storedToken) {
-          throw new Error('Token manquant. Veuillez vous reconnecter.');
-        }
+    const storedToken = token || localStorage.getItem('token');
+    if (storedToken && !user) {
+      dispatch(fetchUser(storedToken));
+    }
+  }, [dispatch, token, user]);
 
-        const response = await axios.post(
-          'http://localhost:3001/api/v1/user/profile',
-          {},
-          {
-            headers: {
-              Authorization: `Bearer ${storedToken}`,
-            },
-          }
-        );
-        const userDetails = response.data.body;
-        setFirstName(userDetails.firstName);
-        setLastName(userDetails.lastName);
-        dispatch(loginSuccess({ user: userDetails, token: storedToken }));
-      } catch (error) {
-        console.error('Erreur lors de la récupération des données utilisateur:', error);
-      }
-    };
-
-    fetchUserData();
-  }, [dispatch, token]);
+  useEffect(() => {
+    setFirstName(user?.firstName || '');
+    setLastName(user?.lastName || '');
+  }, [user]);
 
   const handleUpdate = async () => {
-    try {
-      const response = await axios.put(
-        'http://localhost:3001/api/v1/user/profile',
-        { firstName, lastName },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      const updatedUser = response.data.body;
-      dispatch(updateUser(updatedUser));
+    const storedToken = token || localStorage.getItem('token');
+    const resultAction = await dispatch(updateUser({ firstName, lastName, token: storedToken }));
+    if (updateUser.fulfilled.match(resultAction)) {
       setIsEditing(false);
-    } catch (error) {
-      console.error('Erreur lors de la mise à jour des informations utilisateur:', error);
     }
   };
 
@@ -81,9 +52,12 @@ const User = () => {
               <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} />
             </div>
             <div className='input-content'>
-              <button className="edited-button" onClick={handleUpdate}>Enregistrer</button>
+              <button className="edited-button" onClick={handleUpdate} disabled={loading}>
+                {loading ? 'Enregistrement...' : 'Enregistrer'}
+              </button>
               <button className="edited-button" onClick={handleCancel}>Cancel</button>
             </div>
+            {error && <div style={{color: 'red'}}>{error}</div>}
           </div>
         )}
       </div>

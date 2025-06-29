@@ -1,7 +1,6 @@
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { loginSuccess } from '../../redux/features/authSlice';
-import { login, fetchUserDetails } from '../../api/auth';
+import { useDispatch, useSelector } from 'react-redux';
+import { login } from '../../redux/features/authSlice';
 import { useNavigate } from 'react-router-dom';
 
 const LoginForm = () => {
@@ -9,25 +8,15 @@ const LoginForm = () => {
   const [password, setPassword] = useState('');
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { user, loading, error } = useSelector((state) => state.auth);
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    try {
-      const response = await login(email, password);
-      if (response.status === 200 && response.body?.token) {
-        const { token } = response.body;
-        console.log('Réponse API:', response);
-
-        localStorage.setItem('token', token);
-
-        const userDetails = await fetchUserDetails(token);
-        dispatch(loginSuccess({ user: userDetails, token }));
-        navigate(`/user/${userDetails.id}`);
-      } else {
-        throw new Error(response.message || 'Erreur inconnue');
-      }
-    } catch (error) {
-      alert(`Échec de la connexion : ${error.message}`);
+    const resultAction = await dispatch(login({ email, password }));
+    if (login.fulfilled.match(resultAction)) {
+      navigate(`/user/${resultAction.payload.user.id}`);
+    } else if (login.rejected.match(resultAction)) {
+      alert(`Échec de la connexion : ${resultAction.payload}`);
     }
   };
 
@@ -49,7 +38,10 @@ const LoginForm = () => {
             <input type="checkbox" id='remember-me' />
             <label htmlFor="remember-me">Remember me</label>
           </div>
-          <button type="submit" className='edit-button'>Se connecter</button>
+          <button type="submit" className='edit-button' disabled={loading}>
+            {loading ? 'Connexion...' : 'Se connecter'}
+          </button>
+          {error && <div style={{color: 'red'}}>{error}</div>}
         </form>
       </section>
     </section>

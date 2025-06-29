@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { loginSuccess } from "../redux/features/authSlice";
-import { fetchUserDetails } from "../api/auth";
+import { fetchUser } from "../redux/features/authSlice";
 
 const Accueil = () => {
     const dispatch = useDispatch();
@@ -9,11 +8,7 @@ const Accueil = () => {
     useEffect(() => {
         const token = localStorage.getItem("token");
         if (token) {
-            fetchUserDetails(token).then((userDetails) => {
-                dispatch(loginSuccess({ user: userDetails, token }));
-            }).catch((error) => {
-                console.error('Erreur lors de la récupération des informations utilisateur:', error);
-            });
+            dispatch(fetchUser(token));
         }
     }, [dispatch]);
 
